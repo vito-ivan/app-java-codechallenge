@@ -1,0 +1,13 @@
+application:
+  maximum-transaction-amount: 1000
+  kafka:
+    producer:
+      topic: transaction-processing
+    consumer:
+      group-id: reactive-group
+      topic: transaction-anti-fraud-validation
+logging:
+  level:
+    root: INFO
+    com.bcp.services.trxantifraud: INFO
+

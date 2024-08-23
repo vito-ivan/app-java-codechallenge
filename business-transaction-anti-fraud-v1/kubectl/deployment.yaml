@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: business-transaction-anti-fraud-v1
+spec:
+  replicas: 1  # Número inicial de réplicas
+  selector:
+    matchLabels:
+      app: business-transaction-anti-fraud-v1
+  template:
+    metadata:
+      labels:
+        app: business-transaction-anti-fraud-v1
+    spec:
+      containers:
+        - name: business-transaction-anti-fraud-v1-container
+          image: vllave/business-transaction-anti-fraud-v1:latest
+          resources:
+            limits:
+              cpu: "2"                   # cpu_limits
+              memory: "1512Mi"            # memory_limits
+            requests:
+              cpu: "40m"                  # cpu_requests
+              memory: "256Mi"             # memory_requests
+          env:
+            - name: JAVA_OPTS
+              value: "-Xms32m -Xmx1024m"  # jvm_xms y jvm_xmx

@@ -1,0 +1,20 @@
+application:
+  kafka:
+    producer:
+      topic: transaction-anti-fraud-validation
+    consumer:
+      group-id: reactive-group
+      topic: transaction-processing
+  trx-types:
+    220: Transferencias ordinaria
+    225: Pago a cta tarjeta
+    320: ORDINARIAS - INMEDIATAS
+    325: PAGO DE TARJETA DE CREDITO - INMEDIATAS
+  trx-statuses:
+    pending: PENDING
+    approved: APPROVED
+    rejected: REJECTED
+logging:
+  level:
+    root: ERROR
+    com.bcp.services.transaction: TRACE

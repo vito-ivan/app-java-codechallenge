@@ -1,0 +1,20 @@
+spring:
+  application:
+    name: business-transaction-anti-fraud
+  webflux:
+    base-path: /transaction-anti-fraud/v1
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    consumer:
+      group-id: reactive-group
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+  profiles:
+    active: local
+server:
+  port: 8080
