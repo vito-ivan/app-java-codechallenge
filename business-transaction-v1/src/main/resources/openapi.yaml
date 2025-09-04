@@ -1,0 +1,277 @@
+openapi: 3.0.3
+info:
+  title: API Business Transaction V1
+  description: API que permite crear y recuperar transacciones financieras.
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8085
+    description: Servidor local
+
+tags:
+  - name: Transaction
+    description: Operaciones relacionadas con transacciones financieras
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    Request-ID:
+      name: Request-ID
+      in: header
+      description: ID único para identificar la solicitud.
+      required: true
+      schema:
+        type: string
+        format: uuid
+        example: 550e8400-e29b-41d4-a716-446655440000
+
+    request-date:
+      name: request-date
+      in: header
+      description: Fecha y hora de la solicitud.
+      required: true
+      schema:
+        type: string
+        format: date-time
+        example: '2020-10-09T14:02:03.987-0700'
+
+    caller-name:
+      name: caller-name
+      in: header
+      description: Nombre de la API que realiza la invocación al servicio.
+      required: true
+      schema:
+        type: string
+        pattern: '^[0-9a-zA-Z.-]*$'
+        maxLength: 100
+        minLength: 5
+        example: business-product-directory-v1
+
+  schemas:
+    TransactionRequest:
+      type: object
+      properties:
+        accountExternalIdDebit:
+          type: string
+          format: uuid
+          description: ID externo de la cuenta desde la cual se debitarán los fondos.
+        accountExternalIdCredit:
+          type: string
+          format: uuid
+          description: ID externo de la cuenta a la cual se acreditarán los fondos.
+        transactionTypeCode:
+          type: string
+          pattern: ^(220|225|320|325)$
+          description: Codigo del tipo de transferencia (220, 225, 320, 325).
+        amount:
+          type: string
+          format: decimal
+          description: Valor monetario de la transacción.
+      required:
+        - accountExternalIdDebit
+        - accountExternalIdCredit
+        - transactionTypeCode
+        - amount
+
+    TransactionResponse:
+      type: object
+      properties:
+        transactionExternalId:
+          type: string
+          format: uuid
+          description: ID externo asignado a la transacción.
+
+    GetTransactionResponse:
+      type: object
+      properties:
+        transactionExternalId:
+          type: string
+          format: uuid
+          description: ID externo asignado a la transacción.
+        transactionType:
+          $ref: '#/components/schemas/TransactionTypeResponse'
+        transactionStatus:
+          $ref: '#/components/schemas/TransactionStatusResponse'
+        amount:
+          type: string
+          format: decimal
+          description: Valor monetario de la transacción.
+        createdAt:
+          type: string
+          format: date-time
+          description: Fecha y hora en que se creó la transacción.
+        updatedAt:
+          type: string
+          format: date-time
+          description: Fecha y hora en que se actualizó la transacción.
+
+    TransactionTypeResponse:
+      type: object
+      properties:
+        code:
+          type: string
+          example: 220
+          description: Codigo del tipo de transferencia.
+        name:
+          type: string
+          example: Transferencia ordinaria
+          description: Nombre del tipo de transacción.
+    TransactionStatusResponse:
+      type: object
+      properties:
+        name:
+          type: string
+          example: pending
+          description: Estado de la transacción.
+
+
+    ApiException:
+      type: object
+      required:
+        - code
+        - description
+        - errorType
+      properties:
+        code:
+          type: string
+          description: Código de error del sistema.
+          example: TL0001
+        description:
+          type: string
+          description: Descripción del error del sistema.
+          example: Error al llamar al servicio
+        errorType:
+          type: string
+          description: Tipo de error (ej. TECHNICAL, BUSINESS).
+          example: TECHNICAL
+        exceptionDetails:
+          type: array
+          description: Lista de detalles del error.
+          items:
+            $ref: '#/components/schemas/ApiExceptionDetail'
+        properties:
+          type: object
+          description: Lista de propiedades adicionales específicas del error.
+          additionalProperties: true
+
+    ApiExceptionDetail:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Código de error específico del detalle/proveedor.
+          example: MB0008
+        component:
+          type: string
+          description: Nombre del componente donde ocurrió el error.
+          example: MB.CardInqV2
+        description:
+          type: string
+          description: Descripción detallada del error.
+          example: Código inválido para el canal
+
+paths:
+  /transactions:
+    post:
+      tags:
+        - Transaction
+      summary: Crea una nueva transacción
+      operationId: createTransaction
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/Request-ID'
+        - $ref: '#/components/parameters/request-date'
+        - $ref: '#/components/parameters/caller-name'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionRequest'
+      responses:
+        '201':
+          description: Transacción creada exitosamente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionResponse'
+        '400':
+          description: Solicitud inválida.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+        '401':
+          description: No autorizado.
+        '403':
+          description: Prohibido.
+        '404':
+          description: No encontrado.
+        '429':
+          description: Demasiadas solicitudes.
+        '500':
+          description: Error interno del servidor.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+        '503':
+          description: Servicio no disponible.
+
+  /transactions/{transactionExternalId}:
+    get:
+      tags:
+        - Transaction
+      summary: Recupera una transacción por su ID externo
+      operationId: getTransaction
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/Request-ID'
+        - $ref: '#/components/parameters/request-date'
+        - $ref: '#/components/parameters/caller-name'
+        - name: transactionExternalId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: ID externo de la transacción.
+      responses:
+        '200':
+          description: Transacción recuperada exitosamente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetTransactionResponse'
+        '400':
+          description: Solicitud inválida.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+        '401':
+          description: No autorizado.
+        '403':
+          description: Prohibido.
+        '404':
+          description: No encontrado.
+        '429':
+          description: Demasiadas solicitudes.
+        '500':
+          description: Error interno del servidor.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiException'
+        '503':
+          description: Servicio no disponible.
+
+security:
+  - bearerAuth: []

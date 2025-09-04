@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter>
+  <Match>
+    <Package name="~com\.bcp\.services\.transaction.*"/>
+    <Bug pattern="SLF4J_LOGGER_SHOULD_BE_NON_STATIC,CRLF_INJECTION_LOGS,EI_EXPOSE_REP2,EI_EXPOSE_REP" />
+  </Match>
+  <Match>
+    <Package name="~com\.bcp\.services\.transaction\.trx\.api.*"/>
+    <Bug pattern="SPRING_ENDPOINT,SIC_INNER_SHOULD_BE_STATIC_ANON" />
+  </Match>
+
+  <Match>
+    <Class name="com.bcp.services.transaction.trx.utils.exception.CustomApiException" />
+    <Bug pattern="NM_CLASS_NOT_EXCEPTION" />
+  </Match>
+
+</FindBugsFilter>
+
+
+
+

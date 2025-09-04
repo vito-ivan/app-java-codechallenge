@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE suppressions PUBLIC
+        "-//Checkstyle//DTD SuppressionFilter Configuration 1.2//EN"
+        "https://checkstyle.org/dtds/suppressions_1_2.dtd">
+
+<suppressions>
+
+    <suppress checks="." files="[\\/]test[\\/]"/>
+    <suppress files="[/\\]target[/\\]" checks=".*"/>
+
+    <suppress checks="HideUtilityClassConstructor" files="StartApplication\.java"/>
+
+    <suppress checks="ParameterNumber" files="ApiException\.java"/>
+
+    <suppress checks="MagicNumber"
+              files="ApiOkHttpLoggingInterceptor\.java"/>
+    <suppress checks="MagicNumber"
+              files="ApiExceptionInterceptor\.java"/>
+    <suppress checks="MagicNumber"
+              files="ErrorCategoryFromThrowable\.java"/>
+    <suppress checks="MagicNumber"
+              files="AuditHeadersInterceptor\.java"/>
+
+    <!-- suppress certain checks on all files in a package -->
+    <suppress files="com[\\/]bcp[\\/]services[\\/]transaction"
+              checks="InvalidJavadocPosition|JavadocMethod|JavadocMethod|JavadocType|JavadocVariable|JavadocStyle|MissingJavadocMethod"/>
+    <suppress files="com[\\/]bcp[\\/]services[\\/]transaction" checks="DesignForExtension"/>
+
+    <suppress files="com[\\/]bcp[\\/]services[\\/]transaction"
+              checks="Header|JavadocPackage|NewlineAtEndOfFile"/>
+
+    <suppress checks="NewlineAtEndOfFile" files="[/\\]resources[/\\]"/>
+</suppressions>

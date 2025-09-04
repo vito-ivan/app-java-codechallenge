@@ -1,0 +1,50 @@
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /openapi
+    enabled: true
+  show-actuator: true
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,openapi,swagger-ui,mappings
+spring:
+  application:
+    name: business-transaction
+  webflux:
+    base-path: /transaction/v1
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    consumer:
+      group-id: reactive-group
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+  r2dbc:
+    url: r2dbc:postgresql://localhost:5432/mypostgresdb
+    username: postgresuser
+    password: postgrespassword
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:/data.sql
+      continue-on-error: true
+  jpa:
+    defer-datasource-initialization: true
+  main:
+    allow-bean-definition-overriding: true
+  messages:
+    basename: ValidationMessages
+  profiles:
+    active: local
+openapi:
+  aPIBusinessTransactionV1:
+    base-path: ''
+server:
+  port: 8085
